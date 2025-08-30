@@ -27,6 +27,7 @@ const Loop = @import("../../runtime/loop.zig").Loop;
 const Navigator = @import("navigator.zig").Navigator;
 const History = @import("history.zig").History;
 const Location = @import("location.zig").Location;
+const Wangli = @import("wangli.zig").Wangli;
 const Crypto = @import("../crypto/crypto.zig").Crypto;
 const Console = @import("../console/console.zig").Console;
 const EventTarget = @import("../dom/event_target.zig").EventTarget;
@@ -53,6 +54,7 @@ pub const Window = struct {
     target: []const u8 = "",
     history: History = .{},
     location: Location = .{},
+    wangli: Wangli = .{},
     storage_shelf: ?*storage.Shelf = null,
 
     // counter for having unique timer ids
@@ -105,6 +107,10 @@ pub const Window = struct {
 
     pub fn get_location(self: *Window) *Location {
         return &self.location;
+    }
+
+    pub fn get_wangli(self: *Window) *Wangli {
+        return &self.wangli;
     }
 
     pub fn set_location(_: *const Window, url: []const u8, page: *Page) !void {
