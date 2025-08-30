@@ -2439,6 +2439,11 @@ pub fn Env(comptime State: type, comptime WebApis: type) type {
             template_proto.set(js_name, js_value, v8.PropertyAttribute.ReadOnly + v8.PropertyAttribute.DontDelete);
         }
 
+        // const std = @import("std");
+        // var stdout_buffer: [1024]u8 = undefined;
+        // var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+        // const stdout = &stdout_writer.interface;
+
         fn generateProperty(comptime Struct: type, comptime name: []const u8, isolate: v8.Isolate, template_proto: v8.ObjectTemplate) void {
             var js_name: v8.Name = undefined;
             if (comptime std.mem.eql(u8, name, "symbol_toStringTag")) {
@@ -2446,6 +2451,7 @@ pub fn Env(comptime State: type, comptime WebApis: type) type {
             } else {
                 js_name = v8.String.initUtf8(isolate, name).toName();
             }
+            _ = std.io.getStdOut().write("js_name " ++ name ++ " \n") catch unreachable;
 
             const getter_callback = v8.FunctionTemplate.initCallback(isolate, struct {
                 fn callback(raw_info: ?*const v8.C_FunctionCallbackInfo) callconv(.c) void {
@@ -2966,6 +2972,7 @@ fn Caller(comptime JsContext: type, comptime State: type) type {
             // inject 'self' as the first parameter
             @field(args, "0") = zig_instance;
 
+            _ = std.io.getStdOut().write("Calling method " ++ named_function.full_name ++ "\n") catch unreachable;
             const res = @call(.auto, func, args);
             info.getReturnValue().set(try js_context.zigValueToJs(res));
         }

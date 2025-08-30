@@ -29,6 +29,12 @@ pub const Location = struct {
         return "";
     }
 
+    pub fn get_wangli(self: *Location, page: *Page) ![]const u8 {
+        _ = self;
+        _ = page;
+        return "wangli_dbg";
+    }
+
     pub fn get_protocol(self: *Location, page: *Page) ![]const u8 {
         if (self.url) |*u| return u.get_protocol(page);
         return "";

@@ -23,6 +23,7 @@ const Window = @import("window.zig").Window;
 const Navigator = @import("navigator.zig").Navigator;
 const History = @import("history.zig").History;
 const Location = @import("location.zig").Location;
+const Wangli = @import("wangli.zig").Wangli;
 const MediaQueryList = @import("media_query_list.zig").MediaQueryList;
 
 pub const Interfaces = .{
@@ -35,6 +36,7 @@ pub const Interfaces = .{
     Navigator,
     History,
     Location,
+    Wangli,
     MediaQueryList,
     @import("DataSet.zig"),
     @import("screen.zig").Interfaces,
