@@ -2451,7 +2451,7 @@ pub fn Env(comptime State: type, comptime WebApis: type) type {
             } else {
                 js_name = v8.String.initUtf8(isolate, name).toName();
             }
-            _ = std.io.getStdOut().write("js_name " ++ name ++ " \n") catch unreachable;
+            // _ = std.io.getStdOut().write("js_name " ++ name ++ " \n") catch unreachable;
 
             const getter_callback = v8.FunctionTemplate.initCallback(isolate, struct {
                 fn callback(raw_info: ?*const v8.C_FunctionCallbackInfo) callconv(.c) void {
@@ -2644,6 +2644,7 @@ pub fn Env(comptime State: type, comptime WebApis: type) type {
                         const type_name = @typeName(ptr.child);
                         if (@hasField(TypeLookup, type_name)) {
                             const template = templates[@field(TYPE_LOOKUP, type_name)];
+                            _ = std.io.getStdOut().write("template is " ++ type_name ++ "\n") catch unreachable;
                             const js_obj = try JsContext.mapZigInstanceToJs(v8_context, template, value);
                             return js_obj.toValue();
                         }
