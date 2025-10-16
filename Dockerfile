@@ -32,9 +32,9 @@ RUN case $TARGETPLATFORM in \
     ln -s /usr/local/lib/zig-${ARCH}-linux-${ZIG}/zig /usr/local/bin/zig
 
 # clone lightpanda
-RUN git clone https://github.com/lightpanda-io/browser.git
+RUN git clone https://github.com/freelw/lightpanda-browser.git
 
-WORKDIR /browser
+WORKDIR /lightpanda-browser
 
 # install deps
 RUN git submodule init && \
@@ -61,7 +61,7 @@ FROM debian:stable-slim
 # copy ca certificates
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-COPY --from=0 /browser/zig-out/bin/lightpanda /bin/lightpanda
+COPY --from=0 /lightpanda-browser/zig-out/bin/lightpanda /bin/lightpanda
 
 EXPOSE 9222/tcp
 
