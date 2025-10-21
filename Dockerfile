@@ -44,9 +44,10 @@ WORKDIR /lightpanda-browser
 RUN git submodule init && \
     git submodule update --recursive
 
-RUN make install-libiconv && \
-    make install-netsurf && \
-    make install-mimalloc
+# Build dependencies with baseline compatibility
+RUN CFLAGS="-O2" CXXFLAGS="-O2" make install-libiconv && \
+    CFLAGS="-O2" CXXFLAGS="-O2" make install-netsurf && \
+    CFLAGS="-O2" CXXFLAGS="-O2" make install-mimalloc
 
 # download and install v8
 RUN case $TARGETPLATFORM in \
@@ -57,8 +58,8 @@ RUN case $TARGETPLATFORM in \
     mkdir -p v8/out/linux/release/obj/zig/ && \
     mv libc_v8.a v8/out/linux/release/obj/zig/libc_v8.a
 
-# build release
-RUN make build
+# build release with baseline CPU for maximum compatibility
+RUN zig build -Doptimize=ReleaseSafe -Dcpu=baseline -Dgit_commit=$(git rev-parse --short HEAD)
 
 FROM debian:stable-slim
 
