@@ -22,9 +22,9 @@ const builtin = @import("builtin");
 
 // https://html.spec.whatwg.org/multipage/system-state.html#navigator
 pub const Navigator = struct {
-    agent: []const u8 = "Lightpanda/1.0",
-    version: []const u8 = "1.0",
-    vendor: []const u8 = "",
+    agent: []const u8 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    version: []const u8 = "141.0.0.0",
+    vendor: []const u8 = "Google Inc.",
     platform: []const u8 = std.fmt.comptimePrint("{any} {any}", .{ builtin.os.tag, builtin.cpu.arch }),
 
     language: []const u8 = "en-US",
