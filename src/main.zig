@@ -108,7 +108,7 @@ fn run(alloc: Allocator) !void {
     }
 
     const user_agent = blk: {
-        const USER_AGENT = "User-Agent: Lightpanda/1.0";
+        const USER_AGENT = "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
         if (args.userAgentSuffix()) |suffix| {
             break :blk try std.fmt.allocPrintSentinel(args_arena.allocator(), "{s} {s}", .{ USER_AGENT, suffix }, 0);
         }

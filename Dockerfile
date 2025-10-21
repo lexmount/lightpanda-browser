@@ -69,4 +69,4 @@ COPY --from=0 /lightpanda-browser/zig-out/bin/lightpanda /bin/lightpanda
 
 EXPOSE 9222/tcp
 
-CMD ["/bin/lightpanda", "serve", "--host", "0.0.0.0", "--port", "9222" , "--user_agent_suffix", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"]
+CMD ["/bin/lightpanda", "serve", "--host", "0.0.0.0", "--port", "9222"]
