@@ -32,7 +32,7 @@ RUN case $TARGETPLATFORM in \
     ln -s /usr/local/lib/zig-${ARCH}-linux-${ZIG}/zig /usr/local/bin/zig
 
 # clone lightpanda
-RUN git clone https://github.com/freelw/lightpanda-browser.git
+RUN git clone git@github.com:lexmount/lightpanda-browser.git
 
 WORKDIR /lightpanda-browser
 
