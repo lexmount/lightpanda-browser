@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM debian:stable
 
 ARG MINISIG=0.12
@@ -13,7 +14,7 @@ RUN apt-get update -yq && \
         pkg-config libglib2.0-dev \
         gperf libexpat1-dev \
         cmake clang \
-        curl git
+        curl git openssh-client
 
 # install minisig
 RUN curl --fail -L -O https://github.com/jedisct1/minisign/releases/download/${MINISIG}/minisign-${MINISIG}-linux.tar.gz && \
@@ -32,7 +33,10 @@ RUN case $TARGETPLATFORM in \
     ln -s /usr/local/lib/zig-${ARCH}-linux-${ZIG}/zig /usr/local/bin/zig
 
 # clone lightpanda
-RUN git clone git@github.com:lexmount/lightpanda-browser.git
+RUN --mount=type=ssh \
+    mkdir -p -m 0700 ~/.ssh && \
+    ssh-keyscan github.com >> ~/.ssh/known_hosts && \
+    git clone git@github.com:lexmount/lightpanda-browser.git
 
 WORKDIR /lightpanda-browser
 
