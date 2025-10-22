@@ -70,4 +70,6 @@ COPY --from=0 /lightpanda-browser/zig-out/bin/lightpanda /bin/lightpanda
 
 EXPOSE 9222/tcp
 
+ENV LIGHTPANDA_DISABLE_TELEMETRY=true
+
 CMD ["/bin/lightpanda", "serve", "--host", "0.0.0.0", "--port", "9222"]
