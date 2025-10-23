@@ -189,6 +189,14 @@ fn attachToTarget(cmd: anytype) !void {
         flatten: bool = true,
     })) orelse return error.InvalidParams;
 
+    // Special handling for STARTUP target
+    if (std.mem.eql(u8, params.targetId, "TID-STARTUP-P")) {
+        return cmd.sendResult(
+            .{ .sessionId = "STARTUP" },
+            .{ .include_session_id = false },
+        );
+    }
+
     const bc = cmd.browser_context orelse return error.BrowserContextNotLoaded;
     const target_id = bc.target_id orelse return error.TargetNotLoaded;
     if (std.mem.eql(u8, target_id, params.targetId) == false) {
