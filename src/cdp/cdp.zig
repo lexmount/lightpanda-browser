@@ -106,6 +106,9 @@ pub fn CDPT(comptime TypeProvider: type) type {
         }
 
         pub fn processMessage(self: *Self, msg: []const u8) !void {
+            // Log incoming CDP message
+            log.info(.cdp, "CDP received", .{ .message = msg });
+
             const arena = &self.message_arena;
             defer _ = arena.reset(.{ .retain_with_limit = 1024 * 16 });
             return self.dispatch(arena.allocator(), self, msg);
@@ -278,6 +281,15 @@ pub fn CDPT(comptime TypeProvider: type) type {
         }
 
         pub fn sendJSON(self: *Self, message: anytype) !void {
+            // Log outgoing CDP message (before sending)
+            const json_str = json.stringifyAlloc(self.allocator, message, .{
+                .emit_null_optional_fields = false,
+            }) catch "[JSON stringify error]";
+            defer if (!std.mem.eql(u8, json_str, "[JSON stringify error]")) {
+                self.allocator.free(json_str);
+            };
+            log.info(.cdp, "CDP sending", .{ .message = json_str });
+
             return self.client.sendJSON(message, .{
                 .emit_null_optional_fields = false,
             });
