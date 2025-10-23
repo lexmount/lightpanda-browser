@@ -282,19 +282,17 @@ pub fn CDPT(comptime TypeProvider: type) type {
 
         pub fn sendJSON(self: *Self, message: anytype) !void {
             // Log outgoing CDP message (serialize to string for logging)
-            var buf = std.ArrayList(u8).init(self.allocator);
-            defer buf.deinit();
-
-            std.json.stringify(message, .{
+            const json_str = std.json.Stringify.valueAlloc(self.allocator, message, .{
                 .emit_null_optional_fields = false,
-            }, buf.writer()) catch {
-                log.info(.cdp, "CDP sending", .{ .message = "[JSON stringify error]" });
+            }) catch {
+                log.info(.cdp, "CDP sending", .{ .message = "[JSON error]" });
                 return self.client.sendJSON(message, .{
                     .emit_null_optional_fields = false,
                 });
             };
+            defer self.allocator.free(json_str);
 
-            log.info(.cdp, "CDP sending", .{ .message = buf.items });
+            log.info(.cdp, "CDP sending", .{ .message = json_str });
 
             return self.client.sendJSON(message, .{
                 .emit_null_optional_fields = false,
