@@ -129,6 +129,12 @@ pub fn CDPT(comptime TypeProvider: type) type {
         // but can also be called internally. For example, Target.sendMessageToTarget
         // calls back into dispatch to capture the response.
         pub fn dispatch(self: *Self, arena: Allocator, sender: anytype, str: []const u8) !void {
+            // Log if this is an internal dispatch (not from processMessage)
+            // We check if sender is not Self (Self means it's from processMessage)
+            if (@TypeOf(sender) != *Self) {
+                log.info(.cdp, "CDP internal dispatch", .{ .message = str });
+            }
+
             const input = json.parseFromSliceLeaky(InputMessage, arena, str, .{
                 .ignore_unknown_fields = true,
             }) catch return error.InvalidJSON;
@@ -281,19 +287,6 @@ pub fn CDPT(comptime TypeProvider: type) type {
         }
 
         pub fn sendJSON(self: *Self, message: anytype) !void {
-            // Log outgoing CDP message (serialize to string for logging)
-            const json_str = std.json.Stringify.valueAlloc(self.allocator, message, .{
-                .emit_null_optional_fields = false,
-            }) catch {
-                log.info(.cdp, "CDP sending", .{ .message = "[JSON error]" });
-                return self.client.sendJSON(message, .{
-                    .emit_null_optional_fields = false,
-                });
-            };
-            defer self.allocator.free(json_str);
-
-            log.info(.cdp, "CDP sending", .{ .message = json_str });
-
             return self.client.sendJSON(message, .{
                 .emit_null_optional_fields = false,
             });
@@ -794,11 +787,22 @@ pub fn Command(comptime CDP_T: type, comptime Sender: type) type {
             include_session_id: bool = true,
         };
         pub fn sendResult(self: *Self, result: anytype, opts: SendResultOpts) !void {
-            return self.sender.sendJSON(.{
+            const response = .{
                 .id = self.input.id,
                 .result = if (comptime @typeInfo(@TypeOf(result)) == .null) struct {}{} else result,
                 .sessionId = if (opts.include_session_id) self.input.session_id else null,
-            });
+            };
+
+            // Log CDP response
+            const json_str = std.json.Stringify.valueAlloc(self.cdp.allocator, response, .{
+                .emit_null_optional_fields = false,
+            }) catch "[JSON error]";
+            defer if (!std.mem.eql(u8, json_str, "[JSON error]")) {
+                self.cdp.allocator.free(json_str);
+            };
+            log.info(.cdp, "CDP response", .{ .message = json_str });
+
+            return self.sender.sendJSON(response);
         }
 
         const SendEventOpts = struct {
@@ -813,11 +817,22 @@ pub fn Command(comptime CDP_T: type, comptime Sender: type) type {
             include_session_id: bool = true,
         };
         pub fn sendError(self: *Self, code: i32, message: []const u8, opts: SendErrorOpts) !void {
-            return self.sender.sendJSON(.{
+            const response = .{
                 .id = self.input.id,
                 .@"error" = .{ .code = code, .message = message },
                 .sessionId = if (opts.include_session_id) self.input.session_id else null,
-            });
+            };
+
+            // Log CDP error response
+            const json_str = std.json.Stringify.valueAlloc(self.cdp.allocator, response, .{
+                .emit_null_optional_fields = false,
+            }) catch "[JSON error]";
+            defer if (!std.mem.eql(u8, json_str, "[JSON error]")) {
+                self.cdp.allocator.free(json_str);
+            };
+            log.info(.cdp, "CDP error", .{ .message = json_str });
+
+            return self.sender.sendJSON(response);
         }
 
         const Input = struct {
