@@ -187,6 +187,28 @@ pub fn CDPT(comptime TypeProvider: type) type {
         // switches to a real BrowserContext.
         // (I can imagine this logic will become driver-specific)
         fn dispatchStartupCommand(command: anytype) !void {
+            // Parse method to handle specific STARTUP commands
+            const input = json.parseFromSliceLeaky(InputMessage, command.arena, command.input.json, .{
+                .ignore_unknown_fields = true,
+            }) catch return command.sendResult(null, .{});
+
+            // Special handling for Page.getFrameTree
+            if (std.mem.eql(u8, input.method, "Page.getFrameTree")) {
+                return command.sendResult(.{
+                    .frameTree = .{
+                        .frame = .{
+                            .id = "TID-STARTUP-P",
+                            .loaderId = "STARTUP-LOADER",
+                            .url = "chrome://newtab/",
+                            .securityOrigin = "",
+                            .secureContextType = "InsecureScheme",
+                            .mimeType = "text/html",
+                        },
+                    },
+                }, .{});
+            }
+
+            // Other methods return empty result
             return command.sendResult(null, .{});
         }
 
