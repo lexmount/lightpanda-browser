@@ -62,8 +62,8 @@ RUN case $TARGETPLATFORM in \
     
 
 # build release with baseline CPU for maximum compatibility
-# RUN zig build -Doptimize=ReleaseSafe -Dcpu=baseline -Dgit_commit=$(git rev-parse --short HEAD)
-RUN zig build -Doptimize=Debug -Dcpu=baseline -Dgit_commit=$(git rev-parse --short HEAD)
+RUN zig build -Doptimize=ReleaseSafe -Dcpu=baseline -Dgit_commit=$(git rev-parse --short HEAD)
+# RUN zig build -Doptimize=Debug -Dcpu=baseline -Dgit_commit=$(git rev-parse --short HEAD)
 
 FROM debian:stable-slim
 
